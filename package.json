@@ -32,11 +32,57 @@
     "concurrently": "^7.1.0",
     "daisyui": "^2.14.2",
     "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "postcss": "^8.4.12",
+    "prettier": "^2.6.2",
+    "prettier-plugin-tailwindcss": "^0.1.10",
     "tailwindcss": "^3.0.24",
     "typescript": "^4.5.5"
   },
-  "engines": {
-    "node": ">=14"
-  }
+  "prettier": {
+    "arrowParens": "always",
+    "bracketSpacing": true,
+    "jsxSingleQuote": true,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 80,
+    "proseWrap": "always",
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "useTabs": false
+  },
+  "eslintConfig": {
+    "extends": [
+      "@remix-run/eslint-config",
+      "@remix-run/eslint-config/node",
+      "@remix-run/eslint-config/jest-testing-library",
+      "prettier"
+    ],
+    "plugins": [
+      "unused-imports",
+      "simple-import-sort",
+      "prettier"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2022
+    },
+    "rules": {
+      "simple-import-sort/imports": "error",
+      "unused-imports/no-unused-imports": "error",
+      "prettier/prettier": "error"
+    },
+    "settings": {
+      "jest": {
+        "version": 27
+      }
+    }
+  },
+  "eslintIgnore": [
+    "/node_modules",
+    "/build",
+    "/public/build"
+  ]
 }
