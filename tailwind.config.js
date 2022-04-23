@@ -1,7 +1,5 @@
 module.exports = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./app/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {},
   },
@@ -10,6 +8,6 @@ module.exports = {
     require('@tailwindcss/forms'),
     require('@tailwindcss/line-clamp'),
     require('@tailwindcss/aspect-ratio'),
-    require("daisyui"),
+    require('daisyui'),
   ],
 }
