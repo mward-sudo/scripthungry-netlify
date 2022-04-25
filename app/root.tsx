@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/node'
+import type { LoaderFunction, MetaFunction } from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -6,8 +6,16 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from '@remix-run/react'
 
+import { Nav } from './components/nav'
+import type {
+  GetNavigationQuery,
+  NavigationLink,
+} from './generated/graphql.server'
+import { GetNavigation } from './generated/graphql.server'
+import { graphQlClient } from './lib/graphql.server'
 import styles from './styles/app.css'
 
 export const meta: MetaFunction = () => ({
@@ -16,11 +24,27 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 })
 
-export function links() {
+export const links = () => {
   return [{ rel: 'stylesheet', href: styles }]
 }
 
-export default function App() {
+type LoaderData = {
+  navLinks: NavigationLink[]
+}
+
+export const loader: LoaderFunction = async () => {
+  const navigationData: GetNavigationQuery = await graphQlClient.request(
+    GetNavigation,
+  )
+  console.log(navigationData)
+
+  return {
+    navLinks: navigationData?.graphcms?.navigationLinks,
+  }
+}
+
+export const App = () => {
+  const { navLinks }: LoaderData = useLoaderData()
   return (
     <html lang='en'>
       <head>
@@ -28,6 +52,7 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <Nav navLinks={navLinks} />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
@@ -36,3 +61,5 @@ export default function App() {
     </html>
   )
 }
+
+export default App
