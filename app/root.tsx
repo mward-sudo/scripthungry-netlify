@@ -9,7 +9,9 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 
-import { Nav } from './components/nav'
+import { Footer } from './components/footer'
+import { MobileDrawer } from './components/navigation/mobile-drawer'
+import { Nav } from './components/navigation/nav'
 import type {
   GetNavigationQuery,
   NavigationLink,
@@ -46,14 +48,26 @@ export const loader: LoaderFunction = async () => {
 export const App = () => {
   const { navLinks }: LoaderData = useLoaderData()
   return (
-    <html lang='en'>
+    <html lang='en' className='h-full'>
       <head>
         <Meta />
         <Links />
       </head>
-      <body>
-        <Nav navLinks={navLinks} />
-        <Outlet />
+
+      <body className='h-full'>
+        <div className='drawer min-h-screen w-full'>
+          <input id='my-drawer-3' type='checkbox' className='drawer-toggle' />
+          <div className='drawer-content flex flex-col'>
+            <div className='container mx-auto flex min-h-screen flex-col p-4'>
+              <Nav navLinks={navLinks} />
+              <div className='prose mx-8 min-w-0 flex-1'>
+                <Outlet />
+              </div>
+              <Footer />
+            </div>
+          </div>
+          <MobileDrawer navLinks={navLinks} />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
