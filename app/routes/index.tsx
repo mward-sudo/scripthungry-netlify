@@ -1,3 +1,7 @@
+export const headers = () => ({
+  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
+})
+
 export default function Index() {
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
