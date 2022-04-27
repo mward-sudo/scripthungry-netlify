@@ -60,7 +60,7 @@ export const App = () => {
           <div className='drawer-content flex flex-col'>
             <div className='container mx-auto flex min-h-screen flex-col p-4'>
               <Nav navLinks={navLinks} />
-              <div className='prose mx-8 min-w-0 flex-1'>
+              <div className='prose max-w-none flex-1 p-2'>
                 <Outlet />
               </div>
               <Footer />
