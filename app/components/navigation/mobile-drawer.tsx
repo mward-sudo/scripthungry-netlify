@@ -1,8 +1,12 @@
-import type { NavigationLink } from '~/generated/graphql.server'
+import type { Graphcms_NavigationLink } from '~/generated/graphql.server'
 
 import { UnknownLink } from '../unknown-link'
 
-export const MobileDrawer = ({ navLinks }: { navLinks: NavigationLink[] }) => (
+export const MobileDrawer = ({
+  navLinks,
+}: {
+  navLinks: Graphcms_NavigationLink[]
+}) => (
   <div className='drawer-side'>
     <label htmlFor='my-drawer-3' className='drawer-overlay'></label>
     <ul className='menu w-80 overflow-y-auto bg-base-100 p-4'>
