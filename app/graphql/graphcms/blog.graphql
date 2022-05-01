@@ -1,0 +1,82 @@
+query Category($category: String!) {
+  graphcms {
+    blogCategory(where: { slug: $category }) {
+      name
+    }
+  }
+}
+
+query Categories {
+  graphcms {
+    blogCategories(orderBy: name_ASC) {
+      slug
+      name
+    }
+  }
+}
+
+query PostsExcerpts($postsPerPage: Int!, $skip: Int!, $category: String!) {
+  graphcms {
+    posts(
+      first: $postsPerPage
+      stage: PUBLISHED
+      skip: $skip
+      orderBy: date_DESC
+      where: { categories_some: { slug_starts_with: $category } }
+    ) {
+      author {
+        ...PostAuthor
+      }
+      excerpt
+      slug
+      title
+      coverImage {
+        ...CoverImage
+      }
+    }
+    postsConnection(
+      stage: PUBLISHED
+      where: { categories_some: { slug_starts_with: $category } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+  }
+}
+
+query PostBySlug($slug: String!) {
+  graphcms {
+    post(where: { slug: $slug }, stage: PUBLISHED) {
+      author {
+        ...PostAuthor
+      }
+      content {
+        html
+      }
+      coverImage {
+        ...CoverImage
+      }
+      date
+      excerpt
+      slug
+      title
+    }
+  }
+}
+
+fragment PostAuthor on Author {
+  name
+  twitterHandle
+  picture {
+    url(transformation: { image: { resize: { height: 100, width: 100 } } })
+    height
+    width
+  }
+}
+
+fragment CoverImage on Asset {
+  width
+  height
+  handle
+}

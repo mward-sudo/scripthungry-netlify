@@ -38,7 +38,6 @@ export const loader: LoaderFunction = async () => {
   const navigationData: GetNavigationQuery = await graphQlClient.request(
     GetNavigation,
   )
-  console.log(navigationData)
 
   return {
     navLinks: navigationData?.graphcms?.navigationLinks,
