@@ -6830,12 +6830,134 @@ export type Query_Root = {
   graphcms?: Maybe<Query>;
 };
 
+export type CategoryQueryVariables = Exact<{
+  category: Scalars['String'];
+}>;
+
+
+export type CategoryQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'Query', blogCategory?: { __typename?: 'BlogCategory', name: string } | null } | null };
+
+export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CategoriesQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'Query', blogCategories: Array<{ __typename?: 'BlogCategory', slug: string, name: string }> } | null };
+
+export type PostsExcerptsQueryVariables = Exact<{
+  postsPerPage: Scalars['Int'];
+  skip: Scalars['Int'];
+  category: Scalars['String'];
+}>;
+
+
+export type PostsExcerptsQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'Query', posts: Array<{ __typename?: 'Post', excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'Asset', url: string, height?: number | null, width?: number | null } | null } | null, coverImage?: { __typename?: 'Asset', width?: number | null, height?: number | null, handle: string } | null }>, postsConnection: { __typename?: 'PostConnection', aggregate: { __typename?: 'Aggregate', count: number } } } | null };
+
+export type PostBySlugQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type PostBySlugQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'Query', post?: { __typename?: 'Post', date: any, excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'Asset', url: string, height?: number | null, width?: number | null } | null } | null, content: { __typename?: 'RichText', html: string }, coverImage?: { __typename?: 'Asset', width?: number | null, height?: number | null, handle: string } | null } | null } | null };
+
+export type PostAuthorFragment = { __typename?: 'Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'Asset', url: string, height?: number | null, width?: number | null } | null };
+
+export type CoverImageFragment = { __typename?: 'Asset', width?: number | null, height?: number | null, handle: string };
+
 export type GetNavigationQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetNavigationQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'Query', navigationLinks: Array<{ __typename?: 'NavigationLink', url: string, linkText: string }> } | null };
 
-
+export const PostAuthor = gql`
+    fragment PostAuthor on Author {
+  name
+  twitterHandle
+  picture {
+    url(transformation: {image: {resize: {height: 100, width: 100}}})
+    height
+    width
+  }
+}
+    `;
+export const CoverImage = gql`
+    fragment CoverImage on Asset {
+  width
+  height
+  handle
+}
+    `;
+export const Category = gql`
+    query Category($category: String!) {
+  graphcms {
+    blogCategory(where: {slug: $category}) {
+      name
+    }
+  }
+}
+    `;
+export const Categories = gql`
+    query Categories {
+  graphcms {
+    blogCategories(orderBy: name_ASC) {
+      slug
+      name
+    }
+  }
+}
+    `;
+export const PostsExcerpts = gql`
+    query PostsExcerpts($postsPerPage: Int!, $skip: Int!, $category: String!) {
+  graphcms {
+    posts(
+      first: $postsPerPage
+      stage: PUBLISHED
+      skip: $skip
+      orderBy: date_DESC
+      where: {categories_some: {slug_starts_with: $category}}
+    ) {
+      author {
+        ...PostAuthor
+      }
+      excerpt
+      slug
+      title
+      coverImage {
+        ...CoverImage
+      }
+    }
+    postsConnection(
+      stage: PUBLISHED
+      where: {categories_some: {slug_starts_with: $category}}
+    ) {
+      aggregate {
+        count
+      }
+    }
+  }
+}
+    ${PostAuthor}
+${CoverImage}`;
+export const PostBySlug = gql`
+    query PostBySlug($slug: String!) {
+  graphcms {
+    post(where: {slug: $slug}, stage: PUBLISHED) {
+      author {
+        ...PostAuthor
+      }
+      content {
+        html
+      }
+      coverImage {
+        ...CoverImage
+      }
+      date
+      excerpt
+      slug
+      title
+    }
+  }
+}
+    ${PostAuthor}
+${CoverImage}`;
 export const GetNavigation = gql`
     query GetNavigation {
   graphcms {
