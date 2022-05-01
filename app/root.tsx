@@ -14,7 +14,7 @@ import { MobileDrawer } from './components/navigation/mobile-drawer'
 import { Nav } from './components/navigation/nav'
 import type {
   GetNavigationQuery,
-  NavigationLink,
+  Graphcms_NavigationLink,
 } from './generated/graphql.server'
 import { GetNavigation } from './generated/graphql.server'
 import { graphQlClient } from './lib/graphql.server'
@@ -31,7 +31,7 @@ export const links = () => {
 }
 
 type LoaderData = {
-  navLinks: NavigationLink[]
+  navLinks: Graphcms_NavigationLink[]
 }
 
 export const loader: LoaderFunction = async () => {

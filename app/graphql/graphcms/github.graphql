@@ -1,0 +1,63 @@
+query gitHubUser($username: String!) {
+  github {
+    user(login: $username) {
+      ...GithubUser
+    }
+  }
+}
+
+fragment GithubUser on gh_User {
+  login
+  name
+  bio
+  avatarUrl
+  url
+  company
+  location
+  followers {
+    totalCount
+  }
+  following {
+    totalCount
+  }
+  contributionsCollection {
+    contributionCalendar {
+      weeks {
+        contributionDays {
+          contributionLevel
+          contributionCount
+        }
+      }
+      totalContributions
+    }
+    contributionYears
+    totalCommitContributions
+    totalIssueContributions
+    totalPullRequestContributions
+  }
+  repositories(first: 100) {
+    ...Repos
+  }
+}
+
+fragment Repos on gh_RepositoryConnection {
+  totalCount
+  nodes {
+    ...Repo
+  }
+}
+
+fragment Repo on gh_Repository {
+  name
+  description
+  url
+  stargazers {
+    totalCount
+  }
+  watchers {
+    totalCount
+  }
+  forks {
+    totalCount
+  }
+}

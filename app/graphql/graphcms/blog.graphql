@@ -65,7 +65,7 @@ query PostBySlug($slug: String!) {
   }
 }
 
-fragment PostAuthor on Author {
+fragment PostAuthor on graphcms_Author {
   name
   twitterHandle
   picture {
@@ -75,7 +75,7 @@ fragment PostAuthor on Author {
   }
 }
 
-fragment CoverImage on Asset {
+fragment CoverImage on graphcms_Asset {
   width
   height
   handle

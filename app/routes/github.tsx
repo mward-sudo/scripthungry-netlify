@@ -1,0 +1,85 @@
+import type { HeadersFunction, LoaderFunction } from '@remix-run/node'
+import { json } from '@remix-run/node'
+import { useCatch, useLoaderData } from '@remix-run/react'
+import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
+import invariant from 'tiny-invariant'
+
+import { LoadNewUser } from '~/components/github-stats/load-new-user'
+import { UserCard } from '~/components/github-stats/user-card'
+import type {
+  GithubUserFragment,
+  GitHubUserQuery,
+} from '~/generated/graphql.server'
+import { GitHubUser } from '~/generated/graphql.server'
+import { graphQlClient } from '~/lib/graphql.server'
+
+export const headers: HeadersFunction = () => ({
+  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
+})
+
+type LoaderData = {
+  githubUserData: GitHubUserQuery
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url)
+  const username = url.searchParams.get('github') ?? 'mward-sudo'
+  try {
+    const githubUserData = await graphQlClient.request<GitHubUserQuery>(
+      GitHubUser,
+      { username },
+    )
+
+    const data: LoaderData = {
+      githubUserData,
+    }
+
+    return json(data)
+  } catch (error) {
+    throw new Response('Github user not found.', { status: 404 })
+  }
+}
+
+const Github = () => {
+  const { githubUserData } = useLoaderData<LoaderData>()
+  invariant(githubUserData.github?.user, 'Github user not found')
+  const user: GithubUserFragment = githubUserData.github.user
+
+  return (
+    <>
+      <LoadNewUser login={user.login} />
+      <UserCard user={user} />
+    </>
+  )
+}
+
+export const CatchBoundary: CatchBoundaryComponent = () => {
+  const caught = useCatch()
+
+  return (
+    <div className='error-container'>
+      <LoadNewUser />
+
+      <div className='alert alert-error mt-8 justify-center text-2xl shadow-lg'>
+        <div>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className='h-6 w-6 flex-shrink-0 stroke-current'
+            fill='none'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth='2'
+              d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+            />
+          </svg>
+          <p className='m-4 my-0'>{caught.data}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Github

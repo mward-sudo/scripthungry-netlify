@@ -1,0 +1,22 @@
+type props = {
+  stats: {
+    label: string
+    value?: number
+  }[]
+}
+
+export const Stats = ({ stats }: props) => {
+  return (
+    <div className='mt-8 flex flex-row flex-wrap justify-center gap-8'>
+      {stats.map(({ label, value }, i) => (
+        <div
+          className='min-w-[9.5rem] border-t-2 border-neutral-content p-2 py-4'
+          key={`stat-${i}`}
+        >
+          <div className='stat-title text-accent-content'>{label}</div>
+          <div className='stat-value text-accent-content'>{value}</div>
+        </div>
+      ))}
+    </div>
+  )
+}
