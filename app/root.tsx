@@ -27,7 +27,10 @@ export const meta: MetaFunction = () => ({
 })
 
 export const links = () => {
-  return [{ rel: 'stylesheet', href: styles }]
+  return [
+    { rel: 'stylesheet', href: styles },
+    { rel: 'preconnect', href: 'https://res.cloudinary.com' },
+  ]
 }
 
 type LoaderData = {
