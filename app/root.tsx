@@ -12,6 +12,7 @@ import {
 import { Footer } from './components/footer'
 import { MobileDrawer } from './components/navigation/mobile-drawer'
 import { Nav } from './components/navigation/nav'
+import { site } from './config'
 import type {
   GetNavigationQuery,
   Graphcms_NavigationLink,
@@ -20,9 +21,12 @@ import { GetNavigation } from './generated/graphql.server'
 import { graphQlClient } from './lib/graphql.server'
 import styles from './styles/app.css'
 
-export const meta: MetaFunction = () => ({
+export const meta: MetaFunction = ({ location }) => ({
   charset: 'utf-8',
-  title: 'New Remix App',
+  title: `Super fast cloud web sites | ${site.name}`,
+  description: site.description,
+  robots: 'index, follow',
+  canonical: `${site.url}${location.pathname}`,
   viewport: 'width=device-width,initial-scale=1',
 })
 

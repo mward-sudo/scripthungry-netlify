@@ -1,11 +1,15 @@
-import type { HeadersFunction, LoaderFunction } from '@remix-run/node'
+import type {
+  HeadersFunction,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
 import { Response } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 
 import { CategoriesCloud } from '~/components/blog/categories-cloud'
 import { Pagination } from '~/components/blog/pagination'
-import { blog } from '~/config'
+import { blog, site } from '~/config'
 import type {
   CategoriesQuery,
   CategoryQuery,
@@ -19,6 +23,10 @@ import { getCloudinaryImageProps } from '~/lib/cloudinary'
 import { graphQlClient } from '~/lib/graphql.server'
 
 import { BlogExcerpt } from './../../components/blog/blog-excerpt'
+
+export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
+  title: getPageTitle(data),
+})
 
 export const headers: HeadersFunction = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
@@ -96,6 +104,19 @@ const getCategoryData = async (categorySlug: string | null) => {
         category: categorySlug,
       })
     : null
+}
+
+const getPageTitle = ({ categoryName, pageNo }: LoaderData) => {
+  const title: Record<number, string>[] = []
+  if (categoryName) {
+    title.push(categoryName)
+  }
+  if (pageNo > 1) {
+    title.push(`Page ${pageNo}`)
+  }
+  title.push(`${site.name} - Blog`)
+
+  return title.join(' | ')
 }
 
 const getPostExcerptData = async (

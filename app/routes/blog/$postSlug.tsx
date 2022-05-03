@@ -1,10 +1,11 @@
-import type { LoaderFunction } from '@remix-run/node'
+import type { LoaderFunction, MetaFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
 import { CloudinaryImage } from '~/components/cloudinary-image'
 import { FullWidthEscape } from '~/components/full-width-escape'
+import { site } from '~/config'
 import type { PostBySlugQuery } from '~/generated/graphql.server'
 import { PostBySlug } from '~/generated/graphql.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
@@ -12,6 +13,11 @@ import { getCloudinaryImageProps } from '~/lib/cloudinary'
 import { graphQlClient } from '~/lib/graphql.server'
 
 import { AuthorDetails } from './../../components/blog/author-details'
+
+export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
+  title: `${data.postData.graphcms?.post?.title} | ${site.name} Blog`,
+  description: data.postData.graphcms?.post?.excerpt,
+})
 
 type LoaderData = {
   postData: PostBySlugQuery
