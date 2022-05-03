@@ -25,6 +25,12 @@ export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
 
 export const headers: HeadersFunction = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
+  Link: '<https://avatars.githubusercontent.com>; rel="preconnect"',
+})
+
+export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
+  title: getPageTitle(data),
+  description: data?.githubUserData.github?.user?.bio,
 })
 
 type LoaderData = {
