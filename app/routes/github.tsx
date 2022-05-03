@@ -18,11 +18,6 @@ import type {
 import { GitHubUser } from '~/generated/graphql.server'
 import { graphQlClient } from '~/lib/graphql.server'
 
-export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
-  title: getPageTitle(data),
-  description: data?.githubUserData.github?.user?.bio,
-})
-
 export const headers: HeadersFunction = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
   Link: '<https://avatars.githubusercontent.com>; rel="preconnect"',
