@@ -28,6 +28,15 @@ export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
   description: data?.githubUserData?.github?.user?.bio,
 })
 
+type GitHubErrorResponse = {
+  response: {
+    errors: Array<{
+      type: string
+      message: string
+    }>
+  }
+}
+
 type LoaderData = {
   githubUserData: GitHubUserQuery
 }
@@ -35,20 +44,17 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url)
   const username = url.searchParams.get('github') ?? 'mward-sudo'
-  try {
-    const githubUserData = await graphQlClient.request<GitHubUserQuery>(
-      GitHubUser,
-      { username },
-    )
+  const githubUserData = await graphQlClient
+    .request<GitHubUserQuery>(GitHubUser, { username })
+    .catch((e: GitHubErrorResponse) => {
+      throw new Response(`${e.response.errors[0].message}`, { status: 404 })
+    })
 
-    const data: LoaderData = {
-      githubUserData,
-    }
-
-    return json(data)
-  } catch (error) {
-    throw new Response('Github user not found.', { status: 404 })
+  const data: LoaderData = {
+    githubUserData,
   }
+
+  return json(data)
 }
 
 const Github = () => {
