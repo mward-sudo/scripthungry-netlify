@@ -25,7 +25,7 @@ export const headers: HeadersFunction = () => ({
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
   title: getPageTitle(data),
-  description: data?.githubUserData.github?.user?.bio,
+  description: data?.githubUserData?.github?.user?.bio,
 })
 
 type LoaderData = {
