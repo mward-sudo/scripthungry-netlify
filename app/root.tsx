@@ -1,4 +1,8 @@
-import type { LoaderFunction, MetaFunction } from '@remix-run/node'
+import type {
+  ErrorBoundaryComponent,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -6,8 +10,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useCatch,
   useLoaderData,
 } from '@remix-run/react'
+import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
 
 import { Footer } from './components/footer'
 import { MobileDrawer } from './components/navigation/mobile-drawer'
@@ -68,34 +74,79 @@ export const loader: LoaderFunction = async () => {
   }
 }
 
+const Document = ({ children }: { children: React.ReactNode }) => (
+  <html lang='en' className='h-full'>
+    <head>
+      <Meta />
+      <Links />
+    </head>
+    <body className='h-full'>
+      {children}
+      <ScrollRestoration />
+      <Scripts />
+      <LiveReload />
+    </body>
+  </html>
+)
+
 export const App = () => {
   const { navLinks }: LoaderData = useLoaderData()
   return (
-    <html lang='en' className='h-full'>
-      <head>
-        <Meta />
-        <Links />
-      </head>
-
-      <body className='h-full'>
-        <div className='drawer min-h-screen w-full'>
-          <input id='my-drawer-3' type='checkbox' className='drawer-toggle' />
-          <div className='drawer-content flex flex-col'>
-            <div className='container mx-auto flex min-h-screen flex-col p-4'>
-              <Nav navLinks={navLinks} />
-              <div className='prose max-w-none flex-1 p-2'>
-                <Outlet />
-              </div>
-              <Footer />
+    <Document>
+      <div className='drawer min-h-screen w-full'>
+        <input id='my-drawer-3' type='checkbox' className='drawer-toggle' />
+        <div className='drawer-content flex flex-col'>
+          <div className='container mx-auto flex min-h-screen flex-col p-4'>
+            <Nav navLinks={navLinks} />
+            <div className='prose max-w-none flex-1 p-2'>
+              <Outlet />
             </div>
+            <Footer />
           </div>
-          <MobileDrawer navLinks={navLinks} />
         </div>
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
+        <MobileDrawer navLinks={navLinks} />
+      </div>
+    </Document>
+  )
+}
+
+export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+  console.log('error', error)
+  return (
+    <Document>
+      <div className='err'>
+        <h1>Document Error: {error.name}</h1>
+        <pre>{error.message}</pre>
+      </div>
+    </Document>
+  )
+}
+
+export const CatchBoundary: CatchBoundaryComponent = () => {
+  const caught = useCatch()
+  return (
+    <Document>
+      <div className='error-container'>
+        <div className='alert alert-error mt-8 justify-center text-2xl shadow-lg'>
+          <div>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              className='h-6 w-6 flex-shrink-0 stroke-current'
+              fill='none'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='2'
+                d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+              />
+            </svg>
+            <p className='m-4 my-0'>{caught.data}</p>
+          </div>
+        </div>
+      </div>
+    </Document>
   )
 }
 
