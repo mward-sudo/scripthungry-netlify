@@ -35,6 +35,7 @@
     "@graphql-codegen/fragment-matcher": "3.2.1",
     "@graphql-codegen/typescript": "2.4.8",
     "@graphql-codegen/typescript-document-nodes": "2.2.8",
+    "@graphql-codegen/typescript-graphql-request": "^4.4.7",
     "@graphql-codegen/typescript-operations": "2.3.5",
     "@remix-run/dev": "^1.4.1",
     "@remix-run/eslint-config": "^1.4.1",

@@ -5,27 +5,28 @@ import type {
 } from '@remix-run/node'
 import { Response } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { useCatch, useLoaderData } from '@remix-run/react'
+import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
 
 import { CategoriesCloud } from '~/components/blog/categories-cloud'
 import { Pagination } from '~/components/blog/pagination'
 import { blog, site } from '~/config'
 import type {
   CategoriesQuery,
-  CategoryQuery,
   PostsExcerptsQuery,
 } from '~/generated/graphql.server'
-import { Category } from '~/generated/graphql.server'
-import { Categories } from '~/generated/graphql.server'
-import { PostsExcerpts } from '~/generated/graphql.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 import { getCloudinaryImageProps } from '~/lib/cloudinary'
-import { graphQlClient } from '~/lib/graphql.server'
+import { sdk } from '~/lib/graphql.server'
 
 import { BlogExcerpt } from './../../components/blog/blog-excerpt'
 
-export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
-  title: getPageTitle(data),
+export const meta: MetaFunction = ({
+  data,
+}: {
+  data: LoaderData | undefined
+}) => ({
+  title: data ? getPageTitle(data) : '',
 })
 
 export const headers: HeadersFunction = () => ({
@@ -95,15 +96,25 @@ const getBlogImagesData = async (postExcerptData: PostsExcerptsQuery) => {
 }
 
 const getCategoriesData = async () => {
-  return await graphQlClient.request<CategoriesQuery>(Categories)
+  return await sdk.Categories().catch(() => {
+    throw new Error('Error getting categories data')
+  })
 }
 
-const getCategoryData = async (categorySlug: string | null) => {
-  return categorySlug
-    ? await graphQlClient.request<CategoryQuery>(Category, {
-        category: categorySlug,
+const getCategoryData = async (categorySlug: string) => {
+  const category = categorySlug
+    ? await sdk.Category({ category: categorySlug }).catch(() => {
+        throw new Error('Error getting category info')
       })
     : null
+
+  if (categorySlug !== '' && category?.graphcms?.blogCategory === null) {
+    throw new Response(`The category '${categorySlug}' not found`, {
+      status: 404,
+    })
+  }
+
+  return category
 }
 
 const getPageTitle = ({ categoryName, pageNo }: LoaderData) => {
@@ -123,11 +134,23 @@ const getPostExcerptData = async (
   pageNo: number,
   categorySlug: string | null,
 ) => {
-  return await graphQlClient.request<PostsExcerptsQuery>(PostsExcerpts, {
-    postsPerPage: blog.postsPerPage,
-    skip: blog.postsPerPage * (pageNo - 1),
-    category: categorySlug,
-  })
+  const posts = await sdk
+    .PostsExcerpts({
+      postsPerPage: blog.postsPerPage,
+      skip: blog.postsPerPage * (pageNo - 1),
+      category: categorySlug ?? '',
+    })
+    .catch(() => {
+      throw new Error('Error getting posts')
+    })
+
+  if (posts.graphcms?.posts.length === 0) {
+    throw new Response(`No posts in category '${categorySlug}'`, {
+      status: 404,
+    })
+  }
+
+  return posts
 }
 
 const getTotalPages = (postExcerptData: PostsExcerptsQuery) => {
@@ -167,6 +190,30 @@ const BlogIndex = () => {
         </div>
       </div>
     </>
+  )
+}
+
+export const CatchBoundary: CatchBoundaryComponent = () => {
+  const caught = useCatch()
+  return (
+    <div className='alert alert-error mt-8 justify-center text-2xl shadow-lg'>
+      <div>
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          className='h-6 w-6 flex-shrink-0 stroke-current'
+          fill='none'
+          viewBox='0 0 24 24'
+        >
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            strokeWidth='2'
+            d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+          />
+        </svg>
+        <p className='m-4 my-0'>{caught.data}</p>
+      </div>
+    </div>
   )
 }
 

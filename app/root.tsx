@@ -19,12 +19,8 @@ import { Footer } from './components/footer'
 import { MobileDrawer } from './components/navigation/mobile-drawer'
 import { Nav } from './components/navigation/nav'
 import { site } from './config'
-import type {
-  GetNavigationQuery,
-  Graphcms_NavigationLink,
-} from './generated/graphql.server'
-import { GetNavigation } from './generated/graphql.server'
-import { graphQlClient } from './lib/graphql.server'
+import type { Graphcms_NavigationLink } from './generated/graphql.server'
+import { sdk } from './lib/graphql.server'
 import styles from './styles/app.css'
 
 export const meta: MetaFunction = ({ location }) => ({
@@ -65,9 +61,9 @@ type LoaderData = {
 }
 
 export const loader: LoaderFunction = async () => {
-  const navigationData: GetNavigationQuery = await graphQlClient.request(
-    GetNavigation,
-  )
+  const navigationData = await sdk.GetNavigation().catch(() => {
+    throw new Response('Failed to fetch navigation data', { status: 500 })
+  })
 
   return {
     navLinks: navigationData?.graphcms?.navigationLinks,
@@ -111,12 +107,30 @@ export const App = () => {
 }
 
 export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
-  console.log('error', error)
   return (
     <Document>
-      <div className='err'>
-        <h1>Document Error: {error.name}</h1>
-        <pre>{error.message}</pre>
+      <div className='container prose mx-auto flex min-h-screen flex-col justify-center text-center'>
+        <div>
+          <h1 className='m-0'>Something unexpected happened</h1>
+          <div className='alert alert-error mt-8 justify-center text-2xl shadow-lg'>
+            <div>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-6 w-6 flex-shrink-0 stroke-current'
+                fill='none'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+              <p className='m-4 my-0'>{error.message}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </Document>
   )
@@ -126,23 +140,26 @@ export const CatchBoundary: CatchBoundaryComponent = () => {
   const caught = useCatch()
   return (
     <Document>
-      <div className='error-container'>
-        <div className='alert alert-error mt-8 justify-center text-2xl shadow-lg'>
-          <div>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              className='h-6 w-6 flex-shrink-0 stroke-current'
-              fill='none'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
-              />
-            </svg>
-            <p className='m-4 my-0'>{caught.data}</p>
+      <div className='container prose mx-auto mt-16 flex min-h-screen flex-col text-center'>
+        <div>
+          <h1 className='m-0'>Something isn't quite right</h1>
+          <div className='alert alert-error mt-8 justify-center text-2xl shadow-lg'>
+            <div>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-6 w-6 flex-shrink-0 stroke-current'
+                fill='none'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+              <p className='m-4 my-0'>{caught.data}</p>
+            </div>
           </div>
         </div>
       </div>

@@ -15,8 +15,7 @@ import type {
   GithubUserFragment,
   GitHubUserQuery,
 } from '~/generated/graphql.server'
-import { GitHubUser } from '~/generated/graphql.server'
-import { graphQlClient } from '~/lib/graphql.server'
+import { sdk } from '~/lib/graphql.server'
 
 export const headers: HeadersFunction = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
@@ -44,8 +43,8 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url)
   const username = url.searchParams.get('github') ?? 'mward-sudo'
-  const githubUserData = await graphQlClient
-    .request<GitHubUserQuery>(GitHubUser, { username })
+  const githubUserData = await sdk
+    .gitHubUser({ username })
     .catch((e: GitHubErrorResponse) => {
       throw new Response(`${e.response.errors[0].message}`, { status: 404 })
     })
