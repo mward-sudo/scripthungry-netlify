@@ -7,10 +7,9 @@ import { CloudinaryImage } from '~/components/cloudinary-image'
 import { FullWidthEscape } from '~/components/full-width-escape'
 import { site } from '~/config'
 import type { PostBySlugQuery } from '~/generated/graphql.server'
-import { PostBySlug } from '~/generated/graphql.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 import { getCloudinaryImageProps } from '~/lib/cloudinary'
-import { graphQlClient } from '~/lib/graphql.server'
+import { sdk } from '~/lib/graphql.server'
 
 import { AuthorDetails } from './../../components/blog/author-details'
 
@@ -32,8 +31,8 @@ export const loader: LoaderFunction = async ({ params }) => {
   }
 
   // Query GraphQL server for post data, using the post slug
-  const postData = await graphQlClient.request<PostBySlugQuery>(PostBySlug, {
-    slug: postSlug,
+  const postData = await sdk.PostBySlug({ slug: postSlug }).catch(() => {
+    throw new Error('Error retreiving post')
   })
   // Verify post data was found
   if (!postData?.graphcms?.post) {
