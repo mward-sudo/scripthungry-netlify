@@ -3,21 +3,26 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from '@remix-run/node'
-import { Response } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
 
 import { CategoriesCloud } from '~/components/blog/categories-cloud'
+import type { PaginationDetails } from '~/components/blog/pagination'
 import { Pagination } from '~/components/blog/pagination'
-import { blog, site } from '~/config'
 import type {
   CategoriesQuery,
   PostsExcerptsQuery,
 } from '~/generated/graphql.server'
+import {
+  getBlogImagesData,
+  getCategoriesData,
+  getCategoryData,
+  getPageTitle,
+  getPostExcerptData,
+  getTotalPages,
+} from '~/lib/blog.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
-import { getCloudinaryImageProps } from '~/lib/cloudinary'
-import { sdk } from '~/lib/graphql.server'
 
 import { BlogExcerpt } from './../../components/blog/blog-excerpt'
 
@@ -26,21 +31,20 @@ export const meta: MetaFunction = ({
 }: {
   data: LoaderData | undefined
 }) => ({
-  title: data ? getPageTitle(data) : '',
+  title: data?.title,
 })
 
 export const headers: HeadersFunction = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
 })
 
-type LoaderData = {
+export type LoaderData = {
   blogImages: (CloudinaryImageProps | undefined)[]
   categories: CategoriesQuery
   categoryName: string | undefined
-  currentUrl: string
+  pagination: PaginationDetails
   postExcerpts: PostsExcerptsQuery
-  pageNo: number
-  totalPages: number
+  title: string
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -49,127 +53,39 @@ export const loader: LoaderFunction = async ({ request }) => {
   const pageNo = Number(url.searchParams.get('page') ?? '1')
   // Get tye category slug from the request, or null if none
   const categorySlug = url.searchParams.get('category') ?? ''
-  // Get the category from the slug, if any
-  const categoryData = await getCategoryData(categorySlug)
-  // Get the posts
-  const postExcerptData = await getPostExcerptData(pageNo, categorySlug)
-  // Get the categories, for the category cloud
-  const categoriesData = await getCategoriesData()
-  // Get the cloudinary image props for the post excerpts
-  const blogImagesData = await getBlogImagesData(postExcerptData)
-  // Get the total number of pages, for pagination purposes
-  const totalPages = getTotalPages(postExcerptData)
-
-  // Throw a response of 404 if no posts were found
-  if (!postExcerptData.graphcms?.posts.length) {
-    throw new Response('No posts found', { status: 404 })
-  }
+  // Get the category from the slug, if any, the posts and the categories, for the category cloud
+  const [categoryData, postExcerpts, categories] = await Promise.all([
+    getCategoryData(categorySlug),
+    getPostExcerptData(pageNo, categorySlug),
+    getCategoriesData(),
+  ])
+  const categoryName = categoryData?.graphcms?.blogCategory?.name ?? ''
+  // Get the cloudinary image props for the post excerpts, the total number of pages, for pagination purposes and the page title
+  const [blogImages, totalPages, title] = [
+    await getBlogImagesData(postExcerpts),
+    getTotalPages(postExcerpts),
+    getPageTitle({ categoryName, pageNo }),
+  ]
 
   const data: LoaderData = {
-    blogImages: blogImagesData,
-    categories: categoriesData,
-    categoryName: categoryData?.graphcms?.blogCategory?.name,
-    currentUrl: request.url,
-    pageNo,
-    postExcerpts: postExcerptData,
-    totalPages,
+    blogImages,
+    categories,
+    categoryName,
+    pagination: {
+      currentUrl: request.url,
+      pageNo,
+      totalPages,
+    },
+    postExcerpts,
+    title,
   }
 
   return json(data)
 }
 
-const getBlogImagesData = async (postExcerptData: PostsExcerptsQuery) => {
-  return postExcerptData?.graphcms?.posts
-    ? await Promise.all<CloudinaryImageProps | undefined>(
-        postExcerptData.graphcms.posts.map(async (post) => {
-          if (post.coverImage) {
-            return await getCloudinaryImageProps({
-              alt: post.title || '',
-              height: post.coverImage.height || 9,
-              imgName: `graphcms/${post.coverImage.handle}`,
-              width: post.coverImage.width || 16,
-            })
-          }
-        }),
-      )
-    : []
-}
-
-const getCategoriesData = async () => {
-  return await sdk.Categories().catch(() => {
-    throw new Error('Error getting categories data')
-  })
-}
-
-const getCategoryData = async (categorySlug: string) => {
-  const category = categorySlug
-    ? await sdk.Category({ category: categorySlug }).catch(() => {
-        throw new Error('Error getting category info')
-      })
-    : null
-
-  if (categorySlug !== '' && category?.graphcms?.blogCategory === null) {
-    throw new Response(`The category '${categorySlug}' not found`, {
-      status: 404,
-    })
-  }
-
-  return category
-}
-
-const getPageTitle = ({ categoryName, pageNo }: LoaderData) => {
-  const title: Record<number, string>[] = []
-  if (categoryName) {
-    title.push(categoryName)
-  }
-  if (pageNo > 1) {
-    title.push(`Page ${pageNo}`)
-  }
-  title.push(`${site.name} - Blog`)
-
-  return title.join(' | ')
-}
-
-const getPostExcerptData = async (
-  pageNo: number,
-  categorySlug: string | null,
-) => {
-  const posts = await sdk
-    .PostsExcerpts({
-      postsPerPage: blog.postsPerPage,
-      skip: blog.postsPerPage * (pageNo - 1),
-      category: categorySlug ?? '',
-    })
-    .catch(() => {
-      throw new Error('Error getting posts')
-    })
-
-  if (posts.graphcms?.posts.length === 0) {
-    throw new Response(`No posts in category '${categorySlug}'`, {
-      status: 404,
-    })
-  }
-
-  return posts
-}
-
-const getTotalPages = (postExcerptData: PostsExcerptsQuery) => {
-  return postExcerptData?.graphcms
-    ? postExcerptData.graphcms?.postsConnection.aggregate.count /
-        blog.postsPerPage
-    : 1
-}
-
 const BlogIndex = () => {
-  const {
-    blogImages,
-    categories,
-    categoryName,
-    currentUrl,
-    pageNo,
-    postExcerpts,
-    totalPages,
-  } = useLoaderData<LoaderData>()
+  const { blogImages, categories, categoryName, pagination, postExcerpts } =
+    useLoaderData<LoaderData>()
 
   return (
     <>
@@ -179,11 +95,7 @@ const BlogIndex = () => {
             {categoryName ? `${categoryName} Category Posts` : 'Blog'}
           </h1>
           <BlogExcerpt posts={postExcerpts} blogImages={blogImages} />
-          <Pagination
-            pageNo={pageNo}
-            totalPages={totalPages}
-            currentUrl={currentUrl}
-          />
+          <Pagination pagination={pagination} />
         </div>
         <div className='min-w-fit pb-8 text-center lg:w-1/4 lg:pb-0'>
           <CategoriesCloud categories={categories} />

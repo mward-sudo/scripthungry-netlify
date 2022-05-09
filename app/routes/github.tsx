@@ -6,16 +6,11 @@ import type {
 import { json } from '@remix-run/node'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
-import invariant from 'tiny-invariant'
 
 import { LoadNewUser } from '~/components/github-stats/load-new-user'
 import { UserCard } from '~/components/github-stats/user-card'
-import { site } from '~/config'
-import type {
-  GithubUserFragment,
-  GitHubUserQuery,
-} from '~/generated/graphql.server'
-import { sdk } from '~/lib/graphql.server'
+import type { GithubUserFragment } from '~/generated/graphql.server'
+import { getGithubPageTitle, getGithubUser } from '~/lib/github.server'
 
 export const headers: HeadersFunction = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
@@ -23,48 +18,40 @@ export const headers: HeadersFunction = () => ({
 })
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
-  title: getPageTitle(data),
-  description: data?.githubUserData?.github?.user?.bio,
+  title: data.title,
+  description: data.description,
 })
 
-type GitHubErrorResponse = {
-  response: {
-    errors: Array<{
-      type: string
-      message: string
-    }>
-  }
-}
-
 type LoaderData = {
-  githubUserData: GitHubUserQuery
+  githubUser: GithubUserFragment
+  title: string
+  description: string
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url)
   const username = url.searchParams.get('github') ?? 'mward-sudo'
-  const githubUserData = await sdk
-    .gitHubUser({ username })
-    .catch((e: GitHubErrorResponse) => {
-      throw new Response(`${e.response.errors[0].message}`, { status: 404 })
-    })
+  const githubUser = await getGithubUser(username)
+
+  const title = getGithubPageTitle({ user: githubUser })
+  const description = githubUser.bio ?? ''
 
   const data: LoaderData = {
-    githubUserData,
+    githubUser,
+    title,
+    description,
   }
 
   return json(data)
 }
 
 const Github = () => {
-  const { githubUserData } = useLoaderData<LoaderData>()
-  invariant(githubUserData.github?.user, 'Github user not found')
-  const user: GithubUserFragment = githubUserData.github.user
+  const { githubUser } = useLoaderData<LoaderData>()
 
   return (
     <>
-      <LoadNewUser login={user.login} />
-      <UserCard user={user} />
+      <LoadNewUser login={githubUser.login} />
+      <UserCard user={githubUser} />
     </>
   )
 }
@@ -96,23 +83,6 @@ export const CatchBoundary: CatchBoundaryComponent = () => {
       </div>
     </div>
   )
-}
-
-const getPageTitle = (data: LoaderData) => {
-  try {
-    const title: Record<number, string>[] = []
-    if (data.githubUserData.github?.user?.name) {
-      title.push(data.githubUserData.github.user.name)
-    }
-    if (data.githubUserData.github?.user?.login) {
-      title.push(data.githubUserData.github.user.login)
-    }
-    title.push(`Github Profile | ${site.name}`)
-
-    return title.join(' | ')
-  } catch (error) {
-    return `Github User Not Found | Github Profile | ${site.name}`
-  }
 }
 
 export default Github
