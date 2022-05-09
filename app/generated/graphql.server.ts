@@ -30296,9 +30296,11 @@ export type PostBySlugQueryVariables = Exact<{
 }>;
 
 
-export type PostBySlugQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'graphcms_Query', post?: { __typename?: 'graphcms_Post', date: any, excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', url: string, height?: number | null, width?: number | null } | null } | null, content: { __typename?: 'graphcms_RichText', html: string }, coverImage?: { __typename?: 'graphcms_Asset', width?: number | null, height?: number | null, handle: string } | null } | null } | null };
+export type PostBySlugQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'graphcms_Query', post?: { __typename?: 'graphcms_Post', date: any, excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', url: string, height?: number | null, width?: number | null } | null } | null, content: { __typename?: 'graphcms_RichText', raw: any }, coverImage?: { __typename?: 'graphcms_Asset', width?: number | null, height?: number | null, handle: string } | null } | null } | null };
 
 export type PostAuthorFragment = { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', url: string, height?: number | null, width?: number | null } | null };
+
+export type PostContentFragment = { __typename?: 'graphcms_RichText', raw: any };
 
 export type CoverImageFragment = { __typename?: 'graphcms_Asset', width?: number | null, height?: number | null, handle: string };
 
@@ -30329,6 +30331,11 @@ export const PostAuthor = gql`
     height
     width
   }
+}
+    `;
+export const PostContent = gql`
+    fragment PostContent on graphcms_RichText {
+  raw
 }
     `;
 export const CoverImage = gql`
@@ -30456,7 +30463,7 @@ export const PostBySlug = gql`
         ...PostAuthor
       }
       content {
-        html
+        ...PostContent
       }
       coverImage {
         ...CoverImage
@@ -30469,6 +30476,7 @@ export const PostBySlug = gql`
   }
 }
     ${PostAuthor}
+${PostContent}
 ${CoverImage}`;
 export const GitHubUser = gql`
     query gitHubUser($username: String!) {
@@ -31507,6 +31515,11 @@ export const PostAuthorFragmentDoc = gql`
   }
 }
     `;
+export const PostContentFragmentDoc = gql`
+    fragment PostContent on graphcms_RichText {
+  raw
+}
+    `;
 export const CoverImageFragmentDoc = gql`
     fragment CoverImage on graphcms_Asset {
   width
@@ -31632,7 +31645,7 @@ export const PostBySlugDocument = gql`
         ...PostAuthor
       }
       content {
-        html
+        ...PostContent
       }
       coverImage {
         ...CoverImage
@@ -31645,6 +31658,7 @@ export const PostBySlugDocument = gql`
   }
 }
     ${PostAuthorFragmentDoc}
+${PostContentFragmentDoc}
 ${CoverImageFragmentDoc}`;
 export const GitHubUserDocument = gql`
     query gitHubUser($username: String!) {
