@@ -52,7 +52,7 @@ query PostBySlug($slug: String!) {
         ...PostAuthor
       }
       content {
-        html
+        ...PostContent
       }
       coverImage {
         ...CoverImage
@@ -73,6 +73,10 @@ fragment PostAuthor on graphcms_Author {
     height
     width
   }
+}
+
+fragment PostContent on graphcms_RichText {
+  raw
 }
 
 fragment CoverImage on graphcms_Asset {

@@ -3,6 +3,7 @@ import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
+import { Content } from '~/components/blog/content'
 import { CloudinaryImage } from '~/components/cloudinary-image'
 import { FullWidthEscape } from '~/components/full-width-escape'
 import { site } from '~/config'
@@ -72,7 +73,7 @@ const PostSlugRoute = () => {
           </div>
         </FullWidthEscape>
       )}
-      <div dangerouslySetInnerHTML={{ __html: post?.content.html }} />
+      <Content content={post.content} />
     </div>
   )
 }
