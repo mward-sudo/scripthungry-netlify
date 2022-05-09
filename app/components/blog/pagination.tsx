@@ -1,16 +1,17 @@
 import { Link } from '@remix-run/react'
 
-type PaginationProps = {
+export type PaginationDetails = {
+  currentUrl: string
   pageNo: number
   totalPages: number
-  currentUrl: string
 }
 
-export const Pagination = ({
-  pageNo,
-  totalPages,
-  currentUrl,
-}: PaginationProps) => {
+type PaginationProps = {
+  pagination: PaginationDetails
+}
+
+export const Pagination = ({ pagination }: PaginationProps) => {
+  const { currentUrl, pageNo, totalPages } = pagination
   const paginationLinks = generatePageLinksArray(pageNo, totalPages, currentUrl)
 
   if (totalPages <= 1) {

@@ -1,4 +1,8 @@
-import type { LoaderFunction, MetaFunction } from '@remix-run/node'
+import type {
+  HeadersFunction,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import invariant from 'tiny-invariant'
@@ -8,11 +12,14 @@ import { CloudinaryImage } from '~/components/cloudinary-image'
 import { FullWidthEscape } from '~/components/full-width-escape'
 import { site } from '~/config'
 import type { PostBySlugQuery } from '~/generated/graphql.server'
+import { getPostData, getPostImageProps } from '~/lib/blog.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
-import { getCloudinaryImageProps } from '~/lib/cloudinary'
-import { sdk } from '~/lib/graphql.server'
 
 import { AuthorDetails } from './../../components/blog/author-details'
+
+export const headers: HeadersFunction = () => ({
+  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
+})
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
   title: `${data.postData.graphcms?.post?.title} | ${site.name} Blog`,
@@ -31,24 +38,8 @@ export const loader: LoaderFunction = async ({ params }) => {
     throw new Response('No post slug', { status: 404 })
   }
 
-  // Query GraphQL server for post data, using the post slug
-  const postData = await sdk.PostBySlug({ slug: postSlug }).catch(() => {
-    throw new Error('Error retreiving post')
-  })
-  // Verify post data was found
-  if (!postData?.graphcms?.post) {
-    throw new Response('No post found', { status: 404 })
-  }
-
-  const coverImage = postData.graphcms.post.coverImage
-  const postImageProps = coverImage
-    ? await getCloudinaryImageProps({
-        imgName: `graphcms/${coverImage?.handle}`,
-        alt: postData.graphcms.post.title,
-        width: coverImage?.width || 16,
-        height: coverImage?.height || 9,
-      })
-    : null
+  const postData = await getPostData({ postSlug })
+  const postImageProps = await getPostImageProps({ postData })
 
   const data: LoaderData = { postData, postImageProps }
   return json(data)
