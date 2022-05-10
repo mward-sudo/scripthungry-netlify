@@ -1,75 +1,21 @@
-import type { Variants } from 'framer-motion'
-import { motion } from 'framer-motion'
-
 import { FullWidthEscape } from '../full-width-escape'
-
-const headingVariants: Variants = {
-  initial: {
-    opacity: 0,
-    translateX: '-200%',
-    translateZ: '-1000px',
-    transition: {
-      duration: 1,
-      type: 'spring',
-      stiffness: 300,
-    },
-  },
-  animate: {
-    opacity: 1,
-    translateX: '0%',
-    translateZ: '0px',
-    transition: {
-      duration: 1,
-      type: 'spring',
-      stiffness: 300,
-    },
-  },
-}
-const fadeInVariants: Variants = {
-  initial: {
-    opacity: 0,
-    translateY: 250,
-    translateZ: '-1000px',
-    transition: {
-      duration: 0.15,
-      ease: 'easeInOut',
-    },
-  },
-  animate: {
-    opacity: 1,
-    translateY: 0,
-    translateZ: '0px',
-    transition: {
-      duration: 0.25,
-      delay: 0.25,
-    },
-  },
-}
 
 export const Hero = () => {
   return (
     <FullWidthEscape>
-      <motion.div
-        className='relative aspect-[16/9] w-full overflow-auto'
-        initial='initial'
-        animate='animate'
-      >
+      <div className='relative aspect-[16/9] w-full overflow-auto'>
         <div className='hero-content relative z-10 mx-auto h-full w-full max-w-5xl text-center underline-offset-8'>
           <h1
             className='m-0 mb-6 transform-gpu text-5xl font-bold text-green-600 md:text-6xl lg:text-7xl 2xl:text-8xl'
             style={{ perspective: '1000px' }}
           >
-            <motion.div
-              variants={headingVariants}
-              className='relative text-6xl font-black italic text-primary/70 md:text-7xl lg:text-8xl 2xl:text-9xl'
-              style={{ perspective: '1000px' }}
-            >
+            <div className='relative text-6xl font-black italic text-primary/70 md:text-7xl lg:text-8xl 2xl:text-9xl'>
               Super fast
-            </motion.div>
-            <motion.div variants={fadeInVariants}>cloud web sites</motion.div>
+            </div>
+            <div>cloud web sites</div>
           </h1>
         </div>
-      </motion.div>
+      </div>
       <video
         id='background-video'
         autoPlay

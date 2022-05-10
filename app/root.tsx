@@ -8,8 +8,6 @@ import {
   LiveReload,
   Meta,
   Outlet,
-  Scripts,
-  ScrollRestoration,
   useCatch,
   useLoaderData,
 } from '@remix-run/react'
@@ -78,8 +76,6 @@ const Document = ({ children }: { children: React.ReactNode }) => (
     </head>
     <body className='h-full'>
       {children}
-      <ScrollRestoration />
-      <Scripts />
       <LiveReload />
     </body>
   </html>
