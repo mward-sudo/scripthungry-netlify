@@ -11,6 +11,8 @@ export type CloudinaryImageProps = {
   srcSet: string
   sizes: string
   alt: string
+  width: number
+  height: number
   style: {
     backgroundImage: string
     backgroundSize: string
@@ -45,11 +47,7 @@ export const getCloudinaryImageProps: GetCloudinaryImageProps = async ({
   const heightToWidthRatio = height / width
   const blurredImage = await getImgBlur(imgName, heightToWidthRatio)
   return {
-    src: getImageUrl(
-      imgName,
-      averageWidth,
-      Math.ceil(averageWidth * heightToWidthRatio),
-    ),
+    src: getImageUrl(imgName, width, height),
     srcSet: getSrcSet(imgName, heightToWidthRatio, widths),
     sizes: sizes.join(', '),
     alt,
@@ -58,6 +56,8 @@ export const getCloudinaryImageProps: GetCloudinaryImageProps = async ({
       backgroundSize: 'cover',
       aspectRatio: `${width}/${height}`,
     },
+    width,
+    height,
   }
 }
 
@@ -86,12 +86,14 @@ const getImageUrl = (
   blur = 0,
 ) => {
   const cloudinary = getCloudinaryClient
+  const blurEffect = blur === 0 ? Effect.noise(0) : Effect.blur(blur)
+
   return (
     cloudinary
       .image(imgName)
       .format('auto')
       .resize(fill(width, height))
-      .effect(Effect.blur(blur))
+      .effect(blurEffect)
       .toURL()
       // Remove the params from the url
       .replace(/\?.*/, '')
@@ -102,7 +104,7 @@ const getImgBlur = async (
   imgName: string,
   heighToWidthRatio: number,
 ): Promise<string> => {
-  const url = getImageUrl(imgName, 40, Math.ceil(40 * heighToWidthRatio), 40)
+  const url = getImageUrl(imgName, 40, Math.ceil(40 * heighToWidthRatio), 200)
   // Using node typescript, Fetch image from url const and return the image response as a base64 encoded string.
   const imageUrlData = await fetch(url)
   const buffer = await imageUrlData.arrayBuffer()

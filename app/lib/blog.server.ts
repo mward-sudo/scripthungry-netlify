@@ -1,5 +1,8 @@
 import { blog, site } from '~/config'
-import type { PostsExcerptsQuery } from '~/generated/graphql.server'
+import type {
+  PostAuthorFragment,
+  PostsExcerptsQuery,
+} from '~/generated/graphql.server'
 
 import type { PostBySlugQuery } from './../generated/graphql.server'
 import type { CloudinaryImageProps } from './cloudinary'
@@ -46,6 +49,21 @@ export const getPostImageProps = async ({
         alt: postData.graphcms.post.title,
         width: postData.graphcms.post.coverImage.width || 16,
         height: postData.graphcms.post.coverImage.height || 9,
+      })
+    : null
+}
+
+export const getPostAuthorImageProps = async ({
+  postAuthor,
+}: {
+  postAuthor: PostAuthorFragment | undefined | null
+}) => {
+  return postAuthor?.picture?.handle
+    ? await getCloudinaryImageProps({
+        imgName: `graphcms/${postAuthor.picture.handle}`,
+        alt: '',
+        width: 48,
+        height: 48,
       })
     : null
 }

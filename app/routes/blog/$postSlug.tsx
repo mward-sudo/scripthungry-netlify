@@ -12,7 +12,11 @@ import { CloudinaryImage } from '~/components/cloudinary-image'
 import { FullWidthEscape } from '~/components/full-width-escape'
 import { site } from '~/config'
 import type { PostBySlugQuery } from '~/generated/graphql.server'
-import { getPostData, getPostImageProps } from '~/lib/blog.server'
+import {
+  getPostAuthorImageProps,
+  getPostData,
+  getPostImageProps,
+} from '~/lib/blog.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 
 import { AuthorDetails } from './../../components/blog/author-details'
@@ -29,6 +33,7 @@ export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
 type LoaderData = {
   postData: PostBySlugQuery
   postImageProps: CloudinaryImageProps | null
+  authorImageProps: CloudinaryImageProps | null
 }
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -41,18 +46,29 @@ export const loader: LoaderFunction = async ({ params }) => {
   const postData = await getPostData({ postSlug })
   const postImageProps = await getPostImageProps({ postData })
 
-  const data: LoaderData = { postData, postImageProps }
+  const authorImageProps = await getPostAuthorImageProps({
+    postAuthor: postData?.graphcms?.post?.author,
+  })
+
+  const data: LoaderData = { postData, postImageProps, authorImageProps }
   return json(data)
 }
 
 const PostSlugRoute = () => {
-  const { postData, postImageProps } = useLoaderData<LoaderData>()
+  const { postData, postImageProps, authorImageProps } =
+    useLoaderData<LoaderData>()
   invariant(postData?.graphcms?.post, 'No post data')
   const post = postData.graphcms.post
 
   return (
     <div className='mx-auto max-w-3xl'>
-      {post.author && <AuthorDetails author={post.author} date={post.date} />}
+      {post.author && (
+        <AuthorDetails
+          author={post.author}
+          date={post.date}
+          authorImgProps={authorImageProps}
+        />
+      )}
       <h1 className='mt-8 text-center'>{post?.title}</h1>
       {postImageProps && (
         <FullWidthEscape>

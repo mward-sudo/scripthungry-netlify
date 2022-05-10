@@ -3,11 +3,27 @@ import type { CloudinaryImageProps } from '~/lib/cloudinary'
 export const CloudinaryImage = ({
   imgProps,
   className,
+  fixed = false,
 }: {
   imgProps: CloudinaryImageProps | undefined
   className?: string
+  fixed?: boolean
 }) => {
-  return imgProps ? (
+  if (!imgProps) {
+    return null
+  }
+
+  return fixed ? (
+    <div style={imgProps.style}>
+      <img
+        src={imgProps.src}
+        alt={imgProps.alt}
+        width={imgProps.width}
+        height={imgProps.height}
+        className={`${className}`}
+      />
+    </div>
+  ) : (
     <div style={imgProps.style}>
       <img
         src={imgProps.src}
@@ -18,5 +34,5 @@ export const CloudinaryImage = ({
         className={`${className} width-full`}
       />
     </div>
-  ) : null
+  )
 }

@@ -30289,16 +30289,16 @@ export type PostsExcerptsQueryVariables = Exact<{
 }>;
 
 
-export type PostsExcerptsQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'graphcms_Query', posts: Array<{ __typename?: 'graphcms_Post', excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', url: string, height?: number | null, width?: number | null } | null } | null, coverImage?: { __typename?: 'graphcms_Asset', width?: number | null, height?: number | null, handle: string } | null }>, postsConnection: { __typename?: 'graphcms_PostConnection', aggregate: { __typename?: 'graphcms_Aggregate', count: number } } } | null };
+export type PostsExcerptsQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'graphcms_Query', posts: Array<{ __typename?: 'graphcms_Post', excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', handle: string, height?: number | null, width?: number | null } | null } | null, coverImage?: { __typename?: 'graphcms_Asset', width?: number | null, height?: number | null, handle: string } | null }>, postsConnection: { __typename?: 'graphcms_PostConnection', aggregate: { __typename?: 'graphcms_Aggregate', count: number } } } | null };
 
 export type PostBySlugQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
 
-export type PostBySlugQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'graphcms_Query', post?: { __typename?: 'graphcms_Post', date: any, excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', url: string, height?: number | null, width?: number | null } | null } | null, content: { __typename?: 'graphcms_RichText', raw: any }, coverImage?: { __typename?: 'graphcms_Asset', width?: number | null, height?: number | null, handle: string } | null } | null } | null };
+export type PostBySlugQuery = { __typename?: 'query_root', graphcms?: { __typename?: 'graphcms_Query', post?: { __typename?: 'graphcms_Post', date: any, excerpt?: string | null, slug: string, title: string, author?: { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', handle: string, height?: number | null, width?: number | null } | null } | null, content: { __typename?: 'graphcms_RichText', raw: any }, coverImage?: { __typename?: 'graphcms_Asset', width?: number | null, height?: number | null, handle: string } | null } | null } | null };
 
-export type PostAuthorFragment = { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', url: string, height?: number | null, width?: number | null } | null };
+export type PostAuthorFragment = { __typename?: 'graphcms_Author', name: string, twitterHandle?: string | null, picture?: { __typename?: 'graphcms_Asset', handle: string, height?: number | null, width?: number | null } | null };
 
 export type PostContentFragment = { __typename?: 'graphcms_RichText', raw: any };
 
@@ -30327,7 +30327,7 @@ export const PostAuthor = gql`
   name
   twitterHandle
   picture {
-    url(transformation: {image: {resize: {height: 100, width: 100}}})
+    handle
     height
     width
   }
@@ -31509,7 +31509,7 @@ export const PostAuthorFragmentDoc = gql`
   name
   twitterHandle
   picture {
-    url(transformation: {image: {resize: {height: 100, width: 100}}})
+    handle
     height
     width
   }

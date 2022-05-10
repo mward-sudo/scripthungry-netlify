@@ -1,18 +1,24 @@
 import type { PostAuthorFragment } from '~/generated/graphql.server'
+import type { CloudinaryImageProps } from '~/lib/cloudinary'
+
+import { CloudinaryImage } from '../cloudinary-image'
 
 type props = {
   author: PostAuthorFragment
   date: string
+  authorImgProps: CloudinaryImageProps | null
 }
 
-export const AuthorDetails = ({ author, date }: props) => {
+export const AuthorDetails = ({ author, date, authorImgProps }: props) => {
   return (
     <div className='flex items-center justify-center gap-4 text-lg'>
-      <div className='avatar'>
-        <div className='w-12 rounded-xl'>
-          <img src={author?.picture?.url} alt='' className='m-0' />
+      {authorImgProps && (
+        <div className='avatar'>
+          <div className='w-12 rounded-xl'>
+            <CloudinaryImage imgProps={authorImgProps} className='m-0' fixed />
+          </div>
         </div>
-      </div>
+      )}
       <div className='text-base-content/60'>
         Published {date} by <span className='font-bold'>{author.name}</span>
       </div>
