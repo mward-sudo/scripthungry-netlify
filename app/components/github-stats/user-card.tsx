@@ -1,7 +1,10 @@
+import { motion } from 'framer-motion'
+
 import type {
   GithubUserFragment,
   ReposFragment,
 } from '~/generated/graphql.server'
+import { fadeInLeft, fadeInRight, fadeInUp } from '~/lib/animations'
 
 import { Avatar } from './avatar'
 import { Repositories } from './repositories'
@@ -59,24 +62,26 @@ export const UserCard = ({ user }: { user: GithubUserFragment }) => {
       <div className='full-width-escape my-12'>
         <div className='hero bg-base-200 p-4 text-center lg:p-16 lg:text-left'>
           <div className='hero-content max-w-[50rem] flex-col gap-12 lg:flex-row'>
-            <Avatar avatar={user.avatarUrl} />
-            <div>
+            <motion.div variants={fadeInRight}>
+              <Avatar avatar={user.avatarUrl} />
+            </motion.div>
+            <motion.div variants={fadeInLeft}>
               <h1 className='m-0 text-4xl font-bold sm:text-5xl'>
                 Hello there, I am {user.name || user.login}
               </h1>
               {user.bio && <p className='m-0 py-6'>{user.bio}</p>}
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
 
       <Stats stats={stats} />
 
-      <div className='mx-auto mt-16 max-w-4xl'>
+      <motion.div variants={fadeInUp} className='mx-auto mt-16 max-w-4xl'>
         <h2 className='text-center text-3xl font-bold'>User Repositories</h2>
         {repos &&
           repos.map((repo) => <Repositories key={repo?.url} repo={repo} />)}
-      </div>
+      </motion.div>
     </>
   )
 }

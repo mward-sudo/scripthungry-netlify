@@ -6,10 +6,12 @@ import type {
 import { json } from '@remix-run/node'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
+import { motion } from 'framer-motion'
 
 import { LoadNewUser } from '~/components/github-stats/load-new-user'
 import { UserCard } from '~/components/github-stats/user-card'
 import type { GithubUserFragment } from '~/generated/graphql.server'
+import { fadeInLeft } from '~/lib/animations'
 import { getGithubPageTitle, getGithubUser } from '~/lib/github.server'
 
 export const headers: HeadersFunction = () => ({
@@ -50,7 +52,9 @@ const Github = () => {
 
   return (
     <>
-      <LoadNewUser login={githubUser.login} />
+      <motion.div variants={fadeInLeft}>
+        <LoadNewUser login={githubUser.login} />
+      </motion.div>
       <UserCard user={githubUser} />
     </>
   )
