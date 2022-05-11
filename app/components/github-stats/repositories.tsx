@@ -1,6 +1,8 @@
+import { motion } from 'framer-motion'
 import { ImStarFull } from 'react-icons/im'
 
 import type { RepoFragment } from '~/generated/graphql.server'
+import { fadeInLeft } from '~/lib/animations'
 
 type params = {
   repo: RepoFragment | null
@@ -8,7 +10,8 @@ type params = {
 
 export const Repositories = ({ repo }: params) => {
   return repo ? (
-    <a
+    <motion.a
+      variants={fadeInLeft}
       href={repo.url || ''}
       className='my-4 block bg-base-200 p-4 no-underline hover:outline-dotted hover:outline-2 hover:outline-stone-500 dark:bg-base-200'
     >
@@ -24,6 +27,6 @@ export const Repositories = ({ repo }: params) => {
           </span>
         </div>
       </div>
-    </a>
+    </motion.a>
   ) : null
 }

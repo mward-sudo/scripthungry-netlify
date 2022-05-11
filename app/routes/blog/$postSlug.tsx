@@ -5,6 +5,7 @@ import type {
 } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+import { motion } from 'framer-motion'
 import invariant from 'tiny-invariant'
 
 import { Content } from '~/components/blog/content'
@@ -12,6 +13,7 @@ import { CloudinaryImage } from '~/components/cloudinary-image'
 import { FullWidthEscape } from '~/components/full-width-escape'
 import { site } from '~/config'
 import type { PostBySlugQuery } from '~/generated/graphql.server'
+import { fadeInUp } from '~/lib/animations'
 import {
   getPostAuthorImageProps,
   getPostData,
@@ -69,18 +71,22 @@ const PostSlugRoute = () => {
           authorImgProps={authorImageProps}
         />
       )}
-      <h1 className='mt-8 text-center'>{post?.title}</h1>
+      <motion.h1 variants={fadeInUp} className='mt-8 text-center'>
+        {post?.title}
+      </motion.h1>
       {postImageProps && (
         <FullWidthEscape>
-          <div className='container mx-auto'>
+          <motion.div variants={fadeInUp} className='container mx-auto'>
             <CloudinaryImage
               imgProps={postImageProps}
               className='drop-shadow-2xl'
             />
-          </div>
+          </motion.div>
         </FullWidthEscape>
       )}
-      <Content content={post.content} />
+      <motion.div variants={fadeInUp}>
+        <Content content={post.content} />
+      </motion.div>
     </div>
   )
 }

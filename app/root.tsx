@@ -8,16 +8,21 @@ import {
   LiveReload,
   Meta,
   Outlet,
+  Scripts,
+  ScrollRestoration,
   useCatch,
   useLoaderData,
+  useLocation,
 } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import { Footer } from './components/footer'
 import { MobileDrawer } from './components/navigation/mobile-drawer'
 import { Nav } from './components/navigation/nav'
 import { site } from './config'
 import type { Graphcms_NavigationLink } from './generated/graphql.server'
+import { fadeInUp } from './lib/animations'
 import { sdk } from './lib/graphql.server'
 import styles from './styles/app.css'
 
@@ -76,6 +81,8 @@ const Document = ({ children }: { children: React.ReactNode }) => (
     </head>
     <body className='h-full'>
       {children}
+      <Scripts />
+      <ScrollRestoration />
       <LiveReload />
     </body>
   </html>
@@ -83,6 +90,7 @@ const Document = ({ children }: { children: React.ReactNode }) => (
 
 export const App = () => {
   const { navLinks }: LoaderData = useLoaderData()
+
   return (
     <Document>
       <div className='drawer min-h-screen w-full'>
@@ -91,7 +99,16 @@ export const App = () => {
           <div className='container mx-auto flex min-h-screen flex-col p-4'>
             <Nav navLinks={navLinks} />
             <div className='prose max-w-none flex-1 p-2'>
-              <Outlet />
+              <AnimatePresence exitBeforeEnter>
+                <motion.div
+                  variants={fadeInUp}
+                  initial='initial'
+                  animate='animate'
+                  key={useLocation().key}
+                >
+                  <Outlet />
+                </motion.div>
+              </AnimatePresence>
             </div>
             <Footer />
           </div>

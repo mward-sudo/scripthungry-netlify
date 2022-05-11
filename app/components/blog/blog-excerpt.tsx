@@ -1,6 +1,8 @@
 import { Link } from '@remix-run/react'
+import { motion } from 'framer-motion'
 
 import type { PostsExcerptsQuery } from '~/generated/graphql.server'
+import { fadeInUp } from '~/lib/animations'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 
 import { CloudinaryImage } from '../cloudinary-image'
@@ -15,7 +17,11 @@ export const BlogExcerpt = ({
   return (
     <>
       {posts.graphcms?.posts.map((post, index) => (
-        <div key={`blog-excerpt-${post.slug}`} className='mb-20 text-xl'>
+        <motion.div
+          variants={fadeInUp}
+          key={`blog-excerpt-${post.slug}`}
+          className='mb-20 text-xl'
+        >
           <Link
             to={`/blog/${post.slug}`}
             prefetch='intent'
@@ -25,7 +31,7 @@ export const BlogExcerpt = ({
             <CloudinaryImage imgProps={blogImages[index]} />
           </Link>
           <p>{post.excerpt}</p>
-        </div>
+        </motion.div>
       ))}
     </>
   )
