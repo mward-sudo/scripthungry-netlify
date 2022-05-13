@@ -1,8 +1,11 @@
-
+import type {
+  HeadersFunction,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
-import type { HeadersFunction, LoaderFunction, MetaFunction } from '@remix-run/server-runtime';
-import { json } from '@remix-run/server-runtime'
 
 import { CategoriesCloud } from '~/components/blog/categories-cloud'
 import type { PaginationDetails } from '~/components/blog/pagination'
@@ -21,7 +24,7 @@ import {
 } from '~/lib/blog.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 
-import { BlogExcerpt } from '../../components/blog/blog-excerpt'
+import { BlogExcerpt } from './../../components/blog/blog-excerpt'
 
 export const meta: MetaFunction = ({
   data,

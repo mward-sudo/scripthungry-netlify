@@ -1,7 +1,6 @@
-import type { HeadersFunction } from '@remix-run/server-runtime'
-import { Hero } from '../components/home/hero'
+import { Hero } from './../components/home/hero'
 
-export const headers: HeadersFunction = () => ({
+export const headers = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
   Link: '<https://res.cloudinary.com>; rel=preconnect',
 })

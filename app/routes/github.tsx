@@ -1,8 +1,11 @@
-
+import type {
+  HeadersFunction,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
-import type { HeadersFunction, LoaderFunction, MetaFunction } from '@remix-run/server-runtime';
-import { json } from '@remix-run/server-runtime'
 import { motion } from 'framer-motion'
 
 import { LoadNewUser } from '~/components/github-stats/load-new-user'
