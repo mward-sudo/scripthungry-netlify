@@ -34,9 +34,11 @@ export const meta: MetaFunction = ({
   title: data?.title,
 })
 
-export const headers: HeadersFunction = () => ({
+const pageHeaders = {
   'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
-})
+}
+
+export const headers: HeadersFunction = () => pageHeaders
 
 export type LoaderData = {
   blogImages: (CloudinaryImageProps | undefined)[]
@@ -80,7 +82,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     title,
   }
 
-  return json(data)
+  return json(data, { headers: pageHeaders })
 }
 
 const BlogIndex = () => {

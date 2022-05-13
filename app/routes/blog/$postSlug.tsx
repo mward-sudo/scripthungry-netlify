@@ -23,9 +23,11 @@ import type { CloudinaryImageProps } from '~/lib/cloudinary'
 
 import { AuthorDetails } from './../../components/blog/author-details'
 
-export const headers: HeadersFunction = () => ({
+const pageHeaders = {
   'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
-})
+}
+
+export const headers: HeadersFunction = () => pageHeaders
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
   title: `${data.postData.graphcms?.post?.title} | ${site.name} Blog`,
@@ -53,7 +55,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   })
 
   const data: LoaderData = { postData, postImageProps, authorImageProps }
-  return json(data)
+  return json(data, { headers: pageHeaders })
 }
 
 const PostSlugRoute = () => {

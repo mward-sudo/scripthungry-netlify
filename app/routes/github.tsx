@@ -14,10 +14,12 @@ import type { GithubUserFragment } from '~/generated/graphql.server'
 import { fadeInLeft } from '~/lib/animations'
 import { getGithubPageTitle, getGithubUser } from '~/lib/github.server'
 
-export const headers: HeadersFunction = () => ({
+const pageHeaders = {
   'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
   Link: '<https://avatars.githubusercontent.com>; rel="preconnect"',
-})
+}
+
+export const headers: HeadersFunction = () => pageHeaders
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
   title: data.title,
@@ -44,7 +46,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     description,
   }
 
-  return json(data)
+  return json(data, { headers: pageHeaders })
 }
 
 const Github = () => {
