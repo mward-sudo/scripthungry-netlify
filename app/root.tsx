@@ -1,8 +1,3 @@
-import type {
-  ErrorBoundaryComponent,
-  LoaderFunction,
-  MetaFunction,
-} from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -15,13 +10,14 @@ import {
   useLocation,
 } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
+import type { ErrorBoundaryComponent, LoaderFunction, MetaFunction } from '@remix-run/server-runtime'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import { Footer } from './components/footer'
 import { MobileDrawer } from './components/navigation/mobile-drawer'
 import { Nav } from './components/navigation/nav'
 import { site } from './config'
-import type { Graphcms_NavigationLink } from './generated/graphql.server'
+import type { Graphcms_NavigationLink } from './generated/graphql.server';
 import { fadeInUp } from './lib/animations'
 import { sdk } from './lib/graphql.server'
 import styles from './styles/app.css'
@@ -64,7 +60,7 @@ type LoaderData = {
 }
 
 export const loader: LoaderFunction = async () => {
-  const navigationData = await sdk.GetNavigation().catch(() => {
+  const navigationData = await sdk.GetNavigation().catch((error) => {
     throw new Response('Failed to fetch navigation data', { status: 500 })
   })
 

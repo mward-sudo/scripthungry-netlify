@@ -1,3 +1,8 @@
+import {
+    decode as base64Decode,
+    encode as base64Encode,
+  } from 'https://deno.land/std@0.82.0/encoding/base64.ts'
+
 import { Cloudinary } from '@cloudinary/url-gen'
 import { Effect } from '@cloudinary/url-gen/actions/effect'
 import { fill } from '@cloudinary/url-gen/actions/resize'
@@ -108,7 +113,7 @@ const getImgBlur = async (
   // Using node typescript, Fetch image from url const and return the image response as a base64 encoded string.
   const imageUrlData = await fetch(url)
   const buffer = await imageUrlData.arrayBuffer()
-  const stringifiedBuffer = Buffer.from(buffer).toString('base64')
+  const stringifiedBuffer = base64Encode(buffer)
   const contentType = imageUrlData.headers.get('content-type')
   return `data:${contentType};base64,${stringifiedBuffer}`
 }

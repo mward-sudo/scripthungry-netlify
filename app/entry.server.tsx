@@ -1,50 +1,31 @@
-import type { EntryContext, Headers } from '@remix-run/node'
-import { Response } from '@remix-run/node'
-import { RemixServer } from '@remix-run/react'
-import isbot from 'isbot'
-import { renderToPipeableStream } from 'react-dom/server'
-import { PassThrough } from 'stream'
+import type { EntryContext } from "@remix-run/server-runtime";
+import { RemixServer } from "@remix-run/react";
+import { renderToReadableStream } from "react-dom/server";
+import isbot from "isbot";
 
-const ABORT_DELAY = 5000
-
-export default function handleRequest(
+export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext,
+  remixContext: EntryContext
 ) {
-  const callbackName = isbot(request.headers.get('user-agent'))
-    ? 'onAllReady'
-    : 'onShellReady'
-
-  return new Promise((resolve, reject) => {
-    let didError = false
-
-    const { pipe, abort } = renderToPipeableStream(
-      <RemixServer context={remixContext} url={request.url} />,
-      {
-        [callbackName]() {
-          let body = new PassThrough()
-
-          responseHeaders.set('Content-Type', 'text/html')
-
-          resolve(
-            new Response(body, {
-              status: didError ? 500 : responseStatusCode,
-              headers: responseHeaders,
-            }),
-          )
-          pipe(body)
-        },
-        onShellError(err: unknown) {
-          reject(err)
-        },
-        onError(error: unknown) {
-          didError = true
-          console.error(error)
-        },
+  let body = await renderToReadableStream(
+    <RemixServer context={remixContext} url={request.url} />,
+    {
+      onError() {
+        responseStatusCode = 500;
       },
-    )
-    setTimeout(abort, ABORT_DELAY)
-  })
+    }
+  );
+
+  if (isbot(request.headers.get("user-agent"))) {
+    await body.allReady;
+  }
+
+  responseHeaders.set("Content-Type", "text/html");
+
+  return new Response(body, {
+    status: responseStatusCode,
+    headers: responseHeaders,
+  });
 }

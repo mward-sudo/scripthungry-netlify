@@ -1,10 +1,7 @@
-import type {
-  HeadersFunction,
-  LoaderFunction,
-  MetaFunction,
-} from '@remix-run/node'
-import { json } from '@remix-run/node'
+
 import { useLoaderData } from '@remix-run/react'
+import type { HeadersFunction, LoaderFunction, MetaFunction } from '@remix-run/server-runtime';
+import { json } from '@remix-run/server-runtime'
 import { motion } from 'framer-motion'
 import invariant from 'tiny-invariant'
 
@@ -21,7 +18,7 @@ import {
 } from '~/lib/blog.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 
-import { AuthorDetails } from './../../components/blog/author-details'
+import { AuthorDetails } from '../../components/blog/author-details'
 
 export const headers: HeadersFunction = () => ({
   'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
