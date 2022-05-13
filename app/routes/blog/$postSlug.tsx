@@ -24,7 +24,7 @@ import type { CloudinaryImageProps } from '~/lib/cloudinary'
 import { AuthorDetails } from './../../components/blog/author-details'
 
 export const headers: HeadersFunction = () => ({
-  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
+  'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
 })
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
