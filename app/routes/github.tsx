@@ -12,7 +12,7 @@ import { fadeInLeft } from '~/lib/animations'
 import { getGithubPageTitle, getGithubUser } from '~/lib/github.server'
 
 export const headers: HeadersFunction = () => ({
-  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
+  'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
   Link: '<https://avatars.githubusercontent.com>; rel="preconnect"',
 })
 
