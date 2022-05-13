@@ -1,6 +1,6 @@
-import { GraphQLClient } from 'https://deno.land/x/graphql_request/mod.ts'
+import { GraphQLClient } from 'https://deno.land/x/graphql_request@v4.1.0/mod.ts'
 
-import { getSdk } from '~/generated/graphql.server'
+import { getSdk } from '../generated/graphql.server.ts'
 
 export const sdk = getSdk(
   new GraphQLClient(Deno.env.get('HASURA_ENDPOINT') || '', {
