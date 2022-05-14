@@ -1,7 +1,10 @@
-
+import type {
+  HeadersFunction,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import type { HeadersFunction, LoaderFunction, MetaFunction } from '@remix-run/server-runtime';
-import { json } from '@remix-run/server-runtime'
 import { motion } from 'framer-motion'
 import invariant from 'tiny-invariant'
 
@@ -18,11 +21,13 @@ import {
 } from '~/lib/blog.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 
-import { AuthorDetails } from '../../components/blog/author-details'
+import { AuthorDetails } from './../../components/blog/author-details'
 
-export const headers: HeadersFunction = () => ({
-  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
-})
+const pageHeaders = {
+  'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
+}
+
+export const headers: HeadersFunction = () => pageHeaders
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
   title: `${data.postData.graphcms?.post?.title} | ${site.name} Blog`,
@@ -50,7 +55,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   })
 
   const data: LoaderData = { postData, postImageProps, authorImageProps }
-  return json(data)
+  return json(data, { headers: pageHeaders })
 }
 
 const PostSlugRoute = () => {

@@ -1,8 +1,11 @@
-
+import type {
+  HeadersFunction,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
-import type { HeadersFunction, LoaderFunction, MetaFunction } from '@remix-run/server-runtime';
-import { json } from '@remix-run/server-runtime'
 import { motion } from 'framer-motion'
 
 import { LoadNewUser } from '~/components/github-stats/load-new-user'
@@ -11,10 +14,12 @@ import type { GithubUserFragment } from '~/generated/graphql.server'
 import { fadeInLeft } from '~/lib/animations'
 import { getGithubPageTitle, getGithubUser } from '~/lib/github.server'
 
-export const headers: HeadersFunction = () => ({
-  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
+const pageHeaders = {
+  'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
   Link: '<https://avatars.githubusercontent.com>; rel="preconnect"',
-})
+}
+
+export const headers: HeadersFunction = () => pageHeaders
 
 export const meta: MetaFunction = ({ data }: { data: LoaderData }) => ({
   title: data.title,
@@ -41,7 +46,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     description,
   }
 
-  return json(data)
+  return json(data, { headers: pageHeaders })
 }
 
 const Github = () => {

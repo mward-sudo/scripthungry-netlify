@@ -1,8 +1,11 @@
-
+import type {
+  HeadersFunction,
+  LoaderFunction,
+  MetaFunction,
+} from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import type { CatchBoundaryComponent } from '@remix-run/react/routeModules'
-import type { HeadersFunction, LoaderFunction, MetaFunction } from '@remix-run/server-runtime';
-import { json } from '@remix-run/server-runtime'
 
 import { CategoriesCloud } from '~/components/blog/categories-cloud'
 import type { PaginationDetails } from '~/components/blog/pagination'
@@ -21,7 +24,7 @@ import {
 } from '~/lib/blog.server'
 import type { CloudinaryImageProps } from '~/lib/cloudinary'
 
-import { BlogExcerpt } from '../../components/blog/blog-excerpt'
+import { BlogExcerpt } from './../../components/blog/blog-excerpt'
 
 export const meta: MetaFunction = ({
   data,
@@ -31,9 +34,11 @@ export const meta: MetaFunction = ({
   title: data?.title,
 })
 
-export const headers: HeadersFunction = () => ({
-  'Cache-Control': 's-maxage=360, stale-while-revalidate=3600',
-})
+const pageHeaders = {
+  'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
+}
+
+export const headers: HeadersFunction = () => pageHeaders
 
 export type LoaderData = {
   blogImages: (CloudinaryImageProps | undefined)[]
@@ -77,7 +82,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     title,
   }
 
-  return json(data)
+  return json(data, { headers: pageHeaders })
 }
 
 const BlogIndex = () => {
