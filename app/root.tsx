@@ -74,12 +74,12 @@ export const loader: LoaderFunction = async () => {
 }
 
 const Document = ({ children }: { children: React.ReactNode }) => (
-  <html lang='en' className='h-full'>
+  <html lang='en'>
     <head>
       <Meta />
       <Links />
     </head>
-    <body className='h-full'>
+    <body>
       {children}
       <Scripts />
       <ScrollRestoration />
@@ -93,10 +93,10 @@ export const App = () => {
 
   return (
     <Document>
-      <div className='drawer min-h-screen w-full'>
-        <input id='my-drawer-3' type='checkbox' className='drawer-toggle' />
+      <div className='drawer w-full'>
+        <input id='mobile-drawer' type='checkbox' className='drawer-toggle' />
         <div className='drawer-content flex flex-col'>
-          <div className='container mx-auto flex min-h-screen flex-col p-4'>
+          <div className='container mx-auto flex h-full min-h-screen flex-col p-4'>
             <Nav navLinks={navLinks} />
             <div className='prose max-w-none flex-1 p-2'>
               <AnimatePresence exitBeforeEnter>
