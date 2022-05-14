@@ -1,5 +1,5 @@
 export const BurgerButton = () => (
-  <label htmlFor='my-drawer-3' className='btn btn-ghost btn-square'>
+  <label htmlFor='mobile-drawer' className='btn btn-ghost btn-square'>
     <svg
       xmlns='http://www.w3.org/2000/svg'
       fill='none'

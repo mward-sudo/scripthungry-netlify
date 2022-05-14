@@ -1,15 +1,26 @@
-import { UnknownLink } from '../unknown-link'
+import { NavLink as RemixNavLink } from '@remix-run/react'
+import type { ReactNode } from 'react'
 
 export const NavLink = ({
-  url,
-  linkText,
+  to,
+  onClick,
+  children,
 }: {
-  url: string
-  linkText: string
-}) => (
-  <li>
-    <UnknownLink to={url} className='py-4' prefetch='intent' aria-live='polite'>
-      {linkText}
-    </UnknownLink>
-  </li>
-)
+  to: string
+  onClick?: () => void
+  children: ReactNode
+}) => {
+  return (
+    <li>
+      {to.startsWith('http') ? (
+        <a href={to} target='_blank' rel='noopener noreferrer'>
+          {children}
+        </a>
+      ) : (
+        <RemixNavLink to={to} prefetch='render' onClick={onClick}>
+          {children}
+        </RemixNavLink>
+      )}
+    </li>
+  )
+}
