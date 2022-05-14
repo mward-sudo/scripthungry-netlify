@@ -12,7 +12,7 @@
     "dev": "run-p dev:*",
     "dev:codegen": "graphql-codegen --config codegen.yml -w",
     "dev:css": "postcss styles --base styles --dir app/styles -w",
-    "dev:remix": "remix dev",
+    "dev:remix": "remix watch",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "typecheck": "tsc -b"
   },
