@@ -45,6 +45,15 @@ query PostsExcerpts($postsPerPage: Int!, $skip: Int!, $category: String!) {
   }
 }
 
+query PostSlugs {
+  graphcms {
+    posts(stage: PUBLISHED, orderBy: date_DESC) {
+      slug
+      updatedAt
+    }
+  }
+}
+
 query PostBySlug($slug: String!) {
   graphcms {
     post(where: { slug: $slug }, stage: PUBLISHED) {
