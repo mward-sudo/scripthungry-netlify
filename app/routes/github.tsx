@@ -15,7 +15,6 @@ import { fadeInLeft } from '~/lib/animations'
 import { getGithubPageTitle, getGithubUser } from '~/lib/github.server'
 
 const pageHeaders = {
-  'Cache-Control': 'public, max-age=31536000, s-maxage=31536000',
   Link: '<https://avatars.githubusercontent.com>; rel="preconnect"',
 }
 
@@ -46,7 +45,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     description,
   }
 
-  return json(data, { headers: pageHeaders })
+  return json(data)
 }
 
 const Github = () => {
